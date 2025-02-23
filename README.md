@@ -55,6 +55,13 @@ cd pihu26112005-autonomousappbuilder
 npm install
 ```
 
+## create your .enf file ( below is .env.example) 
+```
+AGENT_AI_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GEMINI_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NETLIFY_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
 ## Running the Project
 Start the Next.js development server:
 ```sh
