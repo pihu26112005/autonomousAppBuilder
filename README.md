@@ -69,7 +69,7 @@ npm run build
 
 ## Technologies Used
 - **Agent.ai** - for making multi-agent system
-- **Next.js** - React framework
+- **Next.js** - React framework & Nodejs base Backend
 - **TypeScript** - Static type checking
 - **Tailwind CSS** - Styling framework
 - **WebContainers** - In-browser development environment
