@@ -108,17 +108,15 @@ npm run build
 ### **3. `GET /api/template/route.ts`**
 - Description: Fetches predefined base prompts
 
+## Youtube Demo Video - 
+- https://youtu.be/wfMB5yo_gr0?si=3jZUHv5ftFGZ4PJF
+
 ## Contribution Guidelines
 1. Fork the repository.
 2. Create a new branch (`feature-branch`).
 3. Commit your changes.
 4. Push to your branch and create a PR.
 
-##Youtube Video Link
-
-  ```[(https://youtu.be/wfMB5yo_gr0?si=JfWJdXsGRLWxZWuH)]
-  
-  ```
 
 ## Contact
 For questions or issues, contact [piyushkumar26november@gmail.com].
