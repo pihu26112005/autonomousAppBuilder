@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSystemPrompt } from "@/libs/prompts";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!); // Store API key in .env.local

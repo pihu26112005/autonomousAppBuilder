@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { reactFinalPrompt } from "@/libs/prompts";
-import { basePrompt as nodeBasePrompt } from "@/libs/node";
-import { basePrompt as reactBasePrompt } from "@/libs/react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { reactBaseTemplate } from "@/libs/baseTemplate";
 
