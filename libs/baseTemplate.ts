@@ -244,8 +244,8 @@ export default defineConfig({
         
         function App() {
           return (
-            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-              <p>Start prompting (or ) to see magic happen :)</p>
+            <div className="min-h-screen ">
+              <p>Tumhari Website Tiyarr</p>
             </div>
           );
         }
