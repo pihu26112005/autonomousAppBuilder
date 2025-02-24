@@ -81,6 +81,7 @@ npm run build
 - **Tailwind CSS** - Styling framework
 - **WebContainers** - In-browser development environment
 - **Vite** - Frontend tooling for temp project
+- **Netifly** - for Deployment of built sites
 
 ## API Endpoints
 ### **1. `POST /api/agent/route.ts`**
