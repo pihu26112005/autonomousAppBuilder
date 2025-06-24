@@ -51,7 +51,7 @@ export default function Builder() {
 
   const [templatefiles, setTemplateFiles] = useState<FileItem[]>([]);
 
-  const [Response, setResponse] = useState<any>();
+  const [responseOfChatapi, setresponseOfChatapi] = useState<any>();
 
   const [isChatcomplete, setisChatcomplete] = useState(false);
 
@@ -71,19 +71,19 @@ export default function Builder() {
         return;
       }
 
-      console.log("DOOSRA USE EFFECT");
-      console.log(files, "files ke time pe aah!");
+      // console.log("DOOSRA USE EFFECT");
+      // console.log(files, "files ke time pe aah!");
 
-      // ✅ Function to update files
-      console.log("Updating files in WebContainer...");
+      //  Function to update files
+      // console.log("Updating files in WebContainer...");
 
       let updatedFiles = [...files];
 
-      // ✅ Helper function to find and update a file recursively
+      //  Helper function to find and update a file recursively
       const updateNestedFile = (fileList: any, filePath: any, newContent: any) => {
         return fileList.map((file: FileItem) => {
           if (file.type === "file" && file.path === filePath) {
-            console.log("Updating file:", filePath);
+            // console.log("Updating file:", filePath);
             return { ...file, content: newContent };
           }
           if (file.type === "folder" && file.children) {
@@ -96,29 +96,30 @@ export default function Builder() {
       const addNestedFile = (fileList: FileItem[], newFile: FileItem) => {
         return fileList.map((file) => {
           if (file.type === "folder" && file.name === "src") {
-            console.log("Adding file to /src:", newFile.name);
+            // console.log("Adding file to /src:", newFile.name);
             return { ...file, children: [...(file.children || []), newFile] };
           }
           return file;
         });
       };
 
-      // ✅ Update modified files
-      for (const modifiedFile of Response.modified_files) {
-        console.log("Modifying file:", modifiedFile.path);
+      // console.log("responseOfChatapi from chat api in useffect checking before mounting:", responseOfChatapi);
+      //  Update modified files
+      for (const modifiedFile of responseOfChatapi.modified_files) {
+        // console.log("Modifying file:", modifiedFile.path);
         updatedFiles = updateNestedFile(updatedFiles, modifiedFile.path, modifiedFile.content);
         // await webcontainer.fs.writeFile(modifiedFile.path, modifiedFile.content);
       }
 
 
 
-      // ✅ Add new files in the correct folders
-      for (const newFile of Response.new_files) {
-        console.log("Adding new file:", newFile.path);
+      //  Add new files in the correct folders
+      for (const newFile of responseOfChatapi.new_files) {
+        // console.log("Adding new file:", newFile.path);
         updatedFiles = addNestedFile(updatedFiles, newFile);
       }
 
-      // ✅ Function to create mount structure
+      //  Function to create mount structure
       const createMountStructure = (files: FileItem[]): Record<string, any> => {
         const mountStructure: Record<string, any> = {};
 
@@ -141,91 +142,106 @@ export default function Builder() {
         return mountStructure;
       };
 
-      console.log(files, "files mount se pahle ");
+      // console.log(files, "files mount se pahle ");
       const mountStructure = createMountStructure(updatedFiles);
-      console.log(mountStructure, "mountStructure");
+      // console.log(mountStructure, "mountStructure");
 
-      // ✅ Mount the structure
+      //  Mount the structure
       await webcontainer.mount(mountStructure);
-      console.log("WebContainer mounted successfully!");
+      // console.log("WebContainer mounted successfully!");
 
-      // ✅ Verify mounted files
+      //  Verify mounted files
       try {
         const rootFiles = await webcontainer.fs.readdir("/");
-        console.log("🗂️ Mounted Files in Root:", rootFiles);
+        // console.log(" Mounted Files in Root:", rootFiles);
 
         if (rootFiles.includes(files[1]?.name)) {
-          console.log(`✅ ${files[1].name} is successfully mounted!`);
+          // console.log(` ${files[1].name} is successfully mounted!`);
         }
 
         const filePath = `/${files[1]?.name}`;
         const fileContent = await webcontainer.fs.readFile(filePath, "utf-8");
-        console.log(`📂 Content of ${files[1]?.name}:`, fileContent);
+        // console.log(` Content of ${files[1]?.name}:`, fileContent);
 
       } catch (error) {
         console.error("❌ Error verifying mounted files:", error);
       }
 
 
-      // ✅ Update state
-      console.log("Updated Files:3", updatedFiles);
+      //  Update state
+      // console.log("Updated Files:3", updatedFiles);
       setFiles(updatedFiles);
-      console.log("Files updated successfully!3");
+      // console.log("Files updated successfully!3");
       // };
 
     };
 
     mountAndUpdateFiles();
-  }, [Response]);
+  }, [responseOfChatapi]);
 
 
   async function init() {
     const response = await axios.post(`/template`, {
       prompt: prompt!.trim()
     });
+
     setTemplateSet(true);
 
     const { prompts, uiPrompts } = response.data;
-    console.log(prompts, uiPrompts, "prompts and ui prompts just abhi init me template se aah!");
 
     setLoading(true);
 
     const messages = `${prompts[0]} \n\n User Prompt : ${prompt}`;
 
-    console.log(messages, "messages from chat api");
-
     const stepsResponse = await axios.post(`/agent`, {
       messages: messages
-    })
+    });
+
+    // 🛠️ FIX HERE: Parse if it's a string
+    const rawResponse = stepsResponse.data.response;
+
+    // console.log("Raw response:", rawResponse);
 
 
-    console.log(stepsResponse.data.response, "response from chat api");
+    let parsedResponse = rawResponse;
 
-    setResponse(stepsResponse.data.response);
+    if (typeof rawResponse === "string") {
+      const cleaned = rawResponse
+        .replace(/```json\n?/, '')
+        .replace(/```$/, '')
+        .trim();
+
+      parsedResponse = JSON.parse(cleaned);
+    }
+
+    // console.log("Parsed response:", parsedResponse);
+    // console.log("Array.isArray?", Array.isArray(parsedResponse.modified_files)); // ✅ should be true now
+
+    setresponseOfChatapi(parsedResponse); // ✅ storing parsed object
     setFiles(uiPrompts[0]);
 
     setLoading(false);
     setisChatcomplete(true);
-
   }
 
+
   useEffect(() => {
-    console.log("TEESRA USE EFFECT");
+    // console.log("TEESRA USE EFFECT");
     init();
   }, [])
 
   // useEffect(() => {
   //   if (files.length > 0) {
-  //     console.log(transformFiles(files), "transform files ke time pe aah!");
+  // console.log(transformFiles(files), "transform files ke time pe aah!");
   //     setSandpackFiles(transformFiles(files));
-  //     console.log(sampackFiles, "sampack files ke time pe aah!");
-  //     console.log(files, "files ke time pe aah!");
-  //     console.log(files[0], "files ke time pe aah!");
+  // console.log(sampackFiles, "sampack files ke time pe aah!");
+  // console.log(files, "files ke time pe aah!");
+  // console.log(files[0], "files ke time pe aah!");
   //   }
   // }, [files]);
 
   // useEffect(() => {
-  //   console.log(sampackFiles, "sandpackFiles updated");
+  // console.log(sampackFiles, "sandpackFiles updated");
   // }, [sampackFiles]);
 
   return (
@@ -266,11 +282,11 @@ export default function Builder() {
                             console.error("Invalid files array", files);
                             return;
                           }
-                          console.log("Sending files:", files);
+                          // console.log("Sending files:", files);
                           const response = await axios.post(`/deploy`, { fileItems: files }, {
                             headers: { 'Content-Type': 'application/json' },
                           });
-                          console.log("Deployment response:", response.data);
+                          // console.log("Deployment response:", response.data);
                           if (response.data.success) {
                             // alert(`Deployed successfully: ${response.data.url}`);
                             setWebsiteURL(response.data.url);
@@ -330,8 +346,20 @@ export default function Builder() {
 
                       const stepsResponse = await axios.post(`/agent`, { messages: newMessage });
                       setLoading(false);
-                      console.log(stepsResponse.data.response, "gandi baat agli chat ke sath");
-                      setResponse(stepsResponse.data.response);
+                      // console.log(stepsResponse.data.response, "gandi baat agli chat ke sath");
+                      // 🛠️ FIX HERE: Parse if it's a string
+                      const rawResponse = stepsResponse.data.response;
+                      // console.log("Raw response:", rawResponse);
+                      let parsedResponse = rawResponse;
+                      if (typeof rawResponse === "string") {
+                        const cleaned = rawResponse
+                          .replace(/```json\n?/, '')
+                          .replace(/```$/, '')
+                          .trim();
+
+                        parsedResponse = JSON.parse(cleaned);
+                      }
+                      setresponseOfChatapi(parsedResponse);
                     }}
                     className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-300"
                   >
